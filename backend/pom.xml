@@ -70,6 +70,12 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- SpringDoc OpenAPI 3.0 支持（适用于Spring Boot 3.x） -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -81,7 +87,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version> <!-- 使用更稳定的版本 -->
                 <configuration>
+                    <source>21</source>
+                    <target>21</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -89,6 +98,8 @@
                             <version>1.18.30</version>
                         </path>
                     </annotationProcessorPaths>
+                    <release>21</release>
+                    <optimize>true</optimize>
                 </configuration>
             </plugin>
         </plugins>

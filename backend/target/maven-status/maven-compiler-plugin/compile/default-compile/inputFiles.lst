@@ -1,4 +1,5 @@
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\config\CorsConfig.java
+D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\config\OpenAPIConfig.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\controller\ActivityController.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\controller\ImportController.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\controller\StatisticsController.java
