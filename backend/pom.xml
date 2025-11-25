@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <!-- 用于文件上传处理 -->
         <dependency>
@@ -56,7 +56,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <version>1.18.32</version>
+            <scope>compile</scope>
         </dependency>
         <!-- H2数据库支持 -->
         <dependency>
@@ -86,21 +87,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.1</version> <!-- 使用更稳定的版本 -->
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
-                        </path>
-                    </annotationProcessorPaths>
-                    <release>21</release>
-                    <optimize>true</optimize>
-                </configuration>
+                <artifactId> maven-compiler-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

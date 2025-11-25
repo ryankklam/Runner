@@ -3,6 +3,7 @@ D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\config\O
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\controller\ActivityController.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\controller\ImportController.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\controller\StatisticsController.java
+D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\init\FakeDataInitializer.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\model\Activity.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\model\ActivityDetail.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\model\ImportRecord.java
@@ -16,3 +17,4 @@ D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\service\
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\service\ImportService.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\service\StatisticsService.java
 D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\util\CsvParserUtil.java
+D:\Development\Workspace\Runner\backend\src\main\java\com\garmin\runner\util\DataChecker.java

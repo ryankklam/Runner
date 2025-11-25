@@ -94,24 +94,24 @@ public class ActivityServiceImpl implements ActivityService {
                 return null;
             }
             try {
-                LocalDate date = LocalDate.parse(dateStr, DATE_FORMATTER);
-                activity.setDate(date);
-            } catch (DateTimeParseException e) {
-                // 尝试其他日期格式
-                try {
-                    activity.setDate(LocalDate.parse(dateStr));
-                } catch (DateTimeParseException ex) {
-                    throw new IllegalArgumentException("无效的日期格式: " + dateStr);
+                    LocalDate date = LocalDate.parse(dateStr, DATE_FORMATTER);
+                    activity.setStartTime(date.atStartOfDay());
+                } catch (DateTimeParseException e) {
+                    // 尝试其他日期格式
+                    try {
+                        activity.setStartTime(LocalDate.parse(dateStr).atStartOfDay());
+                    } catch (DateTimeParseException ex) {
+                        throw new IllegalArgumentException("无效的日期格式: " + dateStr);
+                    }
                 }
-            }
 
             // 设置时长（分钟）
             String durationStr = record.get("Duration");
             if (durationStr != null && !durationStr.trim().isEmpty()) {
                 try {
-                    activity.setDuration(Double.parseDouble(durationStr));
+                    activity.setDuration((long)(Double.parseDouble(durationStr) * 60)); // 转换为秒
                 } catch (NumberFormatException e) {
-                    activity.setDuration(0.0);
+                    activity.setDuration(0L); // 设置为Long类型的0
                 }
             }
 
@@ -139,7 +139,7 @@ public class ActivityServiceImpl implements ActivityService {
             String avgHeartRateStr = record.get("Avg Heart Rate");
             if (avgHeartRateStr != null && !avgHeartRateStr.trim().isEmpty()) {
                 try {
-                    activity.setAvgHeartRate(Integer.parseInt(avgHeartRateStr));
+                    activity.setAverageHeartRate(Integer.parseInt(avgHeartRateStr));
                 } catch (NumberFormatException e) {
                     // 可选字段，忽略错误
                 }
@@ -196,11 +196,11 @@ public class ActivityServiceImpl implements ActivityService {
                 match = false;
             }
 
-            if (filters.containsKey("startDate") && activity.getDate().isBefore((LocalDate) filters.get("startDate"))) {
+            if (filters.containsKey("startDate") && activity.getStartTime().toLocalDate().isBefore((LocalDate) filters.get("startDate"))) {
                 match = false;
             }
 
-            if (filters.containsKey("endDate") && activity.getDate().isAfter((LocalDate) filters.get("endDate"))) {
+            if (filters.containsKey("endDate") && activity.getStartTime().toLocalDate().isAfter((LocalDate) filters.get("endDate"))) {
                 match = false;
             }
 

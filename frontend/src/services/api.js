@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
@@ -55,7 +55,7 @@ api.interceptors.response.use(
 export const uploadAPI = {
   // 导入佳明数据
   importGarminData: (formData) => {
-    return axios.post('/api/import/garmin', formData, {
+    return api.post('/import/garmin', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -63,7 +63,7 @@ export const uploadAPI = {
   },
   // 获取导入记录
   getImportRecords: (params) => {
-    return api.get('/api/import/records', { params });
+    return api.get('/import/records', { params });
   }
 };
 
@@ -71,37 +71,37 @@ export const uploadAPI = {
 export const statisticsAPI = {
   // 获取总体统计
   getOverallStatistics: () => {
-    return api.get('/api/statistics/overall');
+    return api.get('/statistics/overall');
   },
   // 按时间范围获取统计
   getStatisticsByDateRange: (startDate, endDate) => {
-    return api.get('/api/statistics/date-range', {
+    return api.get('/statistics/date-range', {
       params: { startDate, endDate }
     });
   },
   // 按活动类型分组统计
   getStatisticsByActivityType: () => {
-    return api.get('/api/statistics/by-type');
+    return api.get('/statistics/by-type');
   },
   // 获取最近活动
   getRecentActivities: (limit = 10) => {
-    return api.get('/api/statistics/recent-activities', {
+    return api.get('/statistics/recent-activities', {
       params: { limit }
     });
   },
   // 获取月度趋势
   getActivityTrendByMonth: (months = 6) => {
-    return api.get('/api/statistics/trend/monthly', {
+    return api.get('/statistics/trend/monthly', {
       params: { months }
     });
   },
   // 获取心率区间统计
   getHeartRateZoneStatistics: () => {
-    return api.get('/api/statistics/heart-rate-zones');
+    return api.get('/statistics/heart-rate-zones');
   },
   // 获取配速区间统计
   getPaceZoneStatistics: () => {
-    return api.get('/api/statistics/pace-zones');
+    return api.get('/statistics/pace-zones');
   }
 };
 

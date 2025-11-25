@@ -13,9 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.*;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional
 public class ImportServiceImpl implements ImportService {
 
     @Autowired
@@ -38,6 +43,10 @@ public class ImportServiceImpl implements ImportService {
             importRecord.setFileSize(file.getSize());
             importRecord.setImportTime(LocalDateTime.now());
             importRecord.setStatus("成功");
+            importRecord.setActivityCount(0); // 初始化为0
+            
+            // 先保存导入记录到数据库
+            importRecord = importRecordRepository.save(importRecord);
             
             // 解析CSV文件
             List<Map<String, String>> csvData = csvParserUtil.parseActivitySummary(file.getInputStream());
@@ -45,7 +54,7 @@ public class ImportServiceImpl implements ImportService {
             // 处理活动数据
             List<Activity> activities = processActivities(csvData, importRecord);
             
-            // 保存导入记录和活动数据
+            // 更新活动数量
             importRecord.setActivityCount(activities.size());
             importRecordRepository.save(importRecord);
             
@@ -151,11 +160,18 @@ public class ImportServiceImpl implements ImportService {
             activity.setCalories(csvParserUtil.parseInteger(getValue(record, "Calories", "卡路里")));
             
             // 设置心率信息
-            activity.setAverageHeartRate(csvParserUtil.parseInteger(getValue(record, "Avg HR", "平均心率")));
-            activity.setMaxHeartRate(csvParserUtil.parseInteger(getValue(record, "Max HR", "最大心率")));
+            // 支持多种可能的键名
+            activity.setAverageHeartRate(csvParserUtil.parseInteger(getValue(record, "Avg HR", "平均心率", "Avg Heart Rate", "Average Heart Rate")));
+            activity.setMaxHeartRate(csvParserUtil.parseInteger(getValue(record, "Max HR", "最大心率", "Max Heart Rate")));
             
-            // 设置配速
-            Double pace = csvParserUtil.parseDouble(getValue(record, "Avg Pace", "平均配速"));
+            // 设置配速（如果没有直接提供，则根据距离和时间计算）
+            Double pace = csvParserUtil.parseDouble(getValue(record, "Avg Pace", "平均配速", "Pace"));
+            if (pace == null && distance != null && distance > 0 && activity.getDuration() != null && activity.getDuration() > 0) {
+                // 计算配速：时间（分钟）/距离（公里）
+                double durationInMinutes = activity.getDuration() / 60.0;
+                double distanceInKm = distance; // CSV中的距离已经是公里
+                pace = durationInMinutes / distanceInKm;
+            }
             if (pace != null) {
                 activity.setAveragePace(pace);
             }
@@ -164,8 +180,8 @@ public class ImportServiceImpl implements ImportService {
             activity.setImportDate(LocalDateTime.now());
             activity.setImportRecord(importRecord);
             
-            // 暂时不处理活动详情数据
-            // activity.setActivityDetails(Collections.emptyList());
+            // 暂时设置空列表，避免级联保存问题
+            activity.setActivityDetails(Collections.emptyList());
             
             activities.add(activity);
         }
@@ -173,14 +189,20 @@ public class ImportServiceImpl implements ImportService {
         // 保存活动数据
         return activityRepository.saveAll(activities);
     }
+    
+    // ActivityDetail生成方法暂时注释，避免Lombok相关编译错误
 
     /**
-     * 从Map中获取值，支持多个可能的键名
+     * 从CSV记录中获取值，支持多个可能的键名
      */
     private String getValue(Map<String, String> record, String... keys) {
         for (String key : keys) {
             if (record.containsKey(key)) {
-                return record.get(key);
+                String value = record.get(key);
+                // 检查值是否为空或仅包含空白字符
+                if (value != null && !value.trim().isEmpty()) {
+                    return value.trim();
+                }
             }
         }
         return null;

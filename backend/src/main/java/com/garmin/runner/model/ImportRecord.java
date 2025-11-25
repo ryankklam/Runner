@@ -1,13 +1,11 @@
 package com.garmin.runner.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "import_records")
-@Data
 public class ImportRecord {
 
     @Id
@@ -34,4 +32,29 @@ public class ImportRecord {
 
     @OneToMany(mappedBy = "importRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Activity> activities;
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getFileName() { return fileName; }
+    public void setFileName(String fileName) { this.fileName = fileName; }
+    
+    public Long getFileSize() { return fileSize; }
+    public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
+    
+    public LocalDateTime getImportTime() { return importTime; }
+    public void setImportTime(LocalDateTime importTime) { this.importTime = importTime; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    
+    public String getErrorMessage() { return errorMessage; }
+    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+    
+    public Integer getActivityCount() { return activityCount; }
+    public void setActivityCount(Integer activityCount) { this.activityCount = activityCount; }
+    
+    public List<Activity> getActivities() { return activities; }
+    public void setActivities(List<Activity> activities) { this.activities = activities; }
 }
