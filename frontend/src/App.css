@@ -1,0 +1,101 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 布局样式 */
+.site-layout-content {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.page-content {
+  padding: 20px;
+}
+
+.upload-area {
+  margin-top: 30px;
+  padding: 40px;
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.upload-area:hover {
+  border-color: #40a9ff;
+}
+
+/* 统计卡片样式 */
+.stats-card {
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.stats-card h3 {
+  margin-top: 0;
+  color: #1890ff;
+}
+
+.stats-card .value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 图表容器样式 */
+.chart-container {
+  margin-top: 30px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .site-layout-content {
+    padding: 16px;
+  }
+  
+  .upload-area {
+    padding: 20px;
+  }
+}
