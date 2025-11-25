@@ -4,6 +4,7 @@
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "java",
             "request": "attach",
@@ -17,12 +18,17 @@
             "request": "launch",
             "mainClass": "${file}"
         },
-        {
+        {   
             "type": "java",
             "name": "RunnerApplication",
             "request": "launch",
             "mainClass": "com.garmin.runner.RunnerApplication",
-            "projectName": "runner"
+            "projectName": "runner",
+            // "console": "externalTerminal", // 关键：使用外部终端
+            "console": "integratedTerminal", // 使用内置终端
+            "internalConsoleOptions": "neverOpen", // 不打开调试控制台
+            "encoding": "utf8", // 关键：指定终端编码为 UTF-8
+            "vmArgs": "-Dfile.encoding=UTF-8" // 关键：强制 JVM 输出 UTF-8
         }
     ]
 }

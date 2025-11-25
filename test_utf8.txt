@@ -1,0 +1,3 @@
+﻿# 绠€鍗曟祴璇曟枃浠?print("娴嬭瘯涓枃鏄剧ず")
+console.log("杩欐槸涓枃娴嬭瘯")
+System.out.println("Java涓枃娴嬭瘯")

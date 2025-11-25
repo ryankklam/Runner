@@ -1,21 +1,77 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
-import { Layout, Menu, Typography, Row, Col } from 'antd'
-import { UploadOutlined, BarChartOutlined, LineChartOutlined, HeartOutlined, PieChartOutlined, RecentOutlined } from '@ant-design/icons'
+import { Layout, Menu, Typography, Row, Col, message } from 'antd'
+import { UploadOutlined, BarChartOutlined, LineChartOutlined, HeartOutlined, PieChartOutlined, CalendarOutlined } from '@ant-design/icons'
 import FileUploader from './components/FileUploader'
 import { StatCardGroup } from './components/StatCard'
 import ChartComponent, { chartUtils } from './components/ChartComponent'
 import Dashboard from './components/Dashboard'
+import { statisticsAPI } from './services/api'
 
 const { Header, Content, Footer } = Layout
 const { Title, Text } = Typography
 
 function App() {
-  const [current, setCurrent] = useState('upload')
+    const [current, setCurrent] = useState('upload')
+    const [apiConnected, setApiConnected] = useState(false)
+    const [apiError, setApiError] = useState(null)
+    const [apiTestInfo, setApiTestInfo] = useState(null)
 
-  const handleMenuClick = (e) => {
-    setCurrent(e.key)
-  }
+    // 组件挂载时测试API连接
+  useEffect(() => {
+    const testApiConnection = async () => {
+      try {
+        console.log('测试API连接...')
+        // 保存API测试的详细信息
+        const apiTestInfo = {
+          timestamp: new Date().toLocaleString(),
+          testUrl: 'http://localhost:8080/api/statistics/overall',
+          status: '测试中',
+          errorDetails: null
+        };
+        setApiTestInfo(apiTestInfo);
+        
+        // 直接使用fetch API进行测试，避免依赖问题
+        const response = await fetch('http://localhost:8080/api/statistics/overall');
+        
+        if (response.ok) {
+          const data = await response.json();
+          apiTestInfo.status = '成功';
+          apiTestInfo.response = data;
+          setApiConnected(true);
+          setApiError(null);
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          apiTestInfo.status = `失败 (HTTP ${response.status})`;
+          apiTestInfo.errorDetails = errorData.message || '未知错误';
+          setApiConnected(true); // 服务是可访问的，但返回了错误
+          setApiError('服务已连接，但可能需要先上传数据');
+        }
+        
+        setApiTestInfo({...apiTestInfo});
+      } catch (error) {
+        console.error('API响应错误:', error);
+        // 保存详细错误信息
+        const apiTestInfo = {
+          timestamp: new Date().toLocaleString(),
+          testUrl: 'http://localhost:8080/api/statistics/overall',
+          status: '连接失败',
+          errorDetails: error.message || '未知错误',
+          errorType: error.name || 'Error'
+        };
+        setApiTestInfo(apiTestInfo);
+        
+        setApiConnected(false);
+        setApiError('网络连接失败，请检查后端服务');
+      }
+    };
+
+    testApiConnection();
+  }, [])
+  
+    const handleMenuClick = (e) => {
+      setCurrent(e.key)
+    }
 
   // 模拟数据 - 实际应用中会从API获取
   const mockOverallStats = [
@@ -175,11 +231,63 @@ function App() {
           <Menu.Item key="trends" icon={<LineChartOutlined />}>运动趋势</Menu.Item>
           <Menu.Item key="heartRate" icon={<HeartOutlined />}>心率分析</Menu.Item>
           <Menu.Item key="activityTypes" icon={<PieChartOutlined />}>活动类型</Menu.Item>
-          <Menu.Item key="recent" icon={<RecentOutlined />}>最近活动</Menu.Item>
+          <Menu.Item key="recent" icon={<CalendarOutlined />}>最近活动</Menu.Item>
         </Menu>
       </Header>
       <Content style={{ padding: '0 50px' }}>
         <div className="site-layout-content" style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+          {/* API连接状态显示 */}
+          <div style={{ 
+            marginBottom: '20px', 
+            padding: '10px', 
+            backgroundColor: apiConnected ? 
+              (apiError ? '#fffbe6' : '#f6ffed') : '#fff2f0', 
+            border: '1px solid', 
+            borderColor: apiConnected ? 
+              (apiError ? '#ffe58f' : '#b7eb8f') : '#ffccc7', 
+            borderRadius: '4px' 
+          }}>
+            <p style={{ margin: 0, marginBottom: '8px' }}>
+              API连接状态: 
+              {apiConnected ? (
+                apiError ? (
+                  <span>
+                    <span style={{ color: '#faad14' }}>已连接</span>
+                    <span style={{ marginLeft: '10px', color: '#faad14' }}>提示: {apiError}</span>
+                    <span style={{ marginLeft: '10px', fontSize: '12px', color: '#666' }}>
+                      (请先使用文件上传功能导入数据)
+                    </span>
+                  </span>
+                ) : (
+                  <span style={{ color: '#52c41a' }}>已连接并正常工作</span>
+                )
+              ) : (
+                <span style={{ color: '#ff4d4f' }}>服务不可用 ({apiError})</span>
+              )}
+            </p>
+            
+            {/* 详细诊断信息 */}
+            {apiTestInfo && (
+              <div style={{ 
+                fontSize: '12px', 
+                color: '#666', 
+                backgroundColor: '#fafafa', 
+                padding: '8px', 
+                borderRadius: '4px',
+                maxHeight: '200px',
+                overflow: 'auto'
+              }}>
+                <p>测试时间: {apiTestInfo.timestamp}</p>
+                <p>测试URL: {apiTestInfo.testUrl}</p>
+                <p>测试状态: {apiTestInfo.status}</p>
+                {apiTestInfo.errorDetails && <p>错误详情: {apiTestInfo.errorDetails}</p>}
+                {apiTestInfo.errorType && <p>错误类型: {apiTestInfo.errorType}</p>}
+                {apiTestInfo.response && (
+                  <p>响应数据: {JSON.stringify(apiTestInfo.response).substring(0, 100)}...</p>
+                )}
+              </div>
+            )}
+          </div>
           {renderContent()}
         </div>
       </Content>

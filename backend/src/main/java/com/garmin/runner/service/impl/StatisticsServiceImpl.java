@@ -3,6 +3,8 @@ package com.garmin.runner.service.impl;
 import com.garmin.runner.model.Activity;
 import com.garmin.runner.repository.ActivityRepository;
 import com.garmin.runner.service.StatisticsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
 
+    private static final Logger log = LoggerFactory.getLogger(StatisticsServiceImpl.class);
+
     @Autowired
     private ActivityRepository activityRepository;
 
@@ -23,40 +27,71 @@ public class StatisticsServiceImpl implements StatisticsService {
         Map<String, Object> statistics = new HashMap<>();
         
         try {
+            log.debug("开始计算总体统计数据");
+            
             // 获取所有活动
+            log.debug("从数据库获取所有活动记录");
             List<Activity> allActivities = activityRepository.findAll();
             
+            // 添加空值检查
+            if (allActivities == null || allActivities.isEmpty()) {
+                log.warn("未找到任何活动记录，返回默认统计数据");
+                statistics.put("totalDistance", 0.0);
+                statistics.put("totalActivities", 0);
+                statistics.put("totalDuration", 0.0);
+                statistics.put("totalCalories", 0);
+                statistics.put("averageHeartRate", 0);
+                statistics.put("averagePace", 0.0);
+                statistics.put("firstActivityDate", null);
+                statistics.put("lastActivityDate", null);
+                statistics.put("success", true);
+                return statistics;
+            }
+            
+            log.debug("成功获取 {} 条活动记录", allActivities.size());
+            
             // 计算总距离（米转换为公里）
+            log.debug("开始计算总距离");
             double totalDistance = allActivities.stream()
+                    .filter(a -> a != null && a.getDistance() != null)
                     .mapToDouble(Activity::getDistance)
-                    .filter(Objects::nonNull)
                     .sum() / 1000;
+            log.debug("计算总距离完成: {} 公里", Math.round(totalDistance * 100) / 100.0);
             
             // 计算总时长（秒转换为小时）
+            log.debug("开始计算总时长");
             double totalDuration = allActivities.stream()
+                    .filter(a -> a != null && a.getDuration() != null)
                     .mapToLong(Activity::getDuration)
-                    .filter(Objects::nonNull)
                     .sum() / 3600.0;
+            log.debug("计算总时长完成: {} 小时", Math.round(totalDuration * 100) / 100.0);
             
             // 计算总卡路里
+            log.debug("开始计算总卡路里");
             int totalCalories = allActivities.stream()
+                    .filter(a -> a != null && a.getCalories() != null)
                     .mapToInt(Activity::getCalories)
-                    .filter(Objects::nonNull)
                     .sum();
+            log.debug("计算总卡路里完成: {} 卡路里", totalCalories);
             
             // 计算平均心率
+            log.debug("开始计算平均心率");
             OptionalDouble avgHeartRate = allActivities.stream()
+                    .filter(a -> a != null && a.getAverageHeartRate() != null)
                     .mapToInt(Activity::getAverageHeartRate)
-                    .filter(Objects::nonNull)
                     .average();
+            log.debug("计算平均心率完成: {}", avgHeartRate.isPresent() ? Math.round(avgHeartRate.getAsDouble()) : 0);
             
             // 计算平均配速
+            log.debug("开始计算平均配速");
             OptionalDouble avgPace = allActivities.stream()
+                    .filter(a -> a != null && a.getAveragePace() != null)
                     .mapToDouble(Activity::getAveragePace)
-                    .filter(Objects::nonNull)
                     .average();
+            log.debug("计算平均配速完成: {}", avgPace.isPresent() ? Math.round(avgPace.getAsDouble() * 100) / 100.0 : 0);
             
             // 填充统计数据
+            log.debug("开始填充统计数据");
             statistics.put("totalDistance", Math.round(totalDistance * 100) / 100.0);
             statistics.put("totalActivities", allActivities.size());
             statistics.put("totalDuration", Math.round(totalDuration * 100) / 100.0);
@@ -64,20 +99,39 @@ public class StatisticsServiceImpl implements StatisticsService {
             statistics.put("averageHeartRate", avgHeartRate.isPresent() ? Math.round(avgHeartRate.getAsDouble()) : 0);
             statistics.put("averagePace", avgPace.isPresent() ? Math.round(avgPace.getAsDouble() * 100) / 100.0 : 0);
             
-            // 获取最早和最新的活动日期
+            // 获取最早和最新的活动日期 - 添加更安全的处理
+            log.debug("开始获取最早和最新的活动日期");
             Optional<Activity> firstActivity = allActivities.stream()
+                    .filter(a -> a != null && a.getStartTime() != null)
                     .min(Comparator.comparing(Activity::getStartTime));
             Optional<Activity> lastActivity = allActivities.stream()
+                    .filter(a -> a != null && a.getStartTime() != null)
                     .max(Comparator.comparing(Activity::getStartTime));
             
             statistics.put("firstActivityDate", firstActivity.map(Activity::getStartTime).orElse(null));
             statistics.put("lastActivityDate", lastActivity.map(Activity::getStartTime).orElse(null));
             
-            statistics.put("success", true);
+            log.debug("最早活动日期: {}, 最新活动日期: {}", 
+                    firstActivity.map(Activity::getStartTime).orElse(null), 
+                    lastActivity.map(Activity::getStartTime).orElse(null));
             
-        } catch (Exception e) {
+            statistics.put("success", true);
+            log.info("总体统计数据计算成功");
+            
+        } catch (NullPointerException e) {
+            // 针对空指针异常的特定处理
+            log.error("计算总体统计数据时发生空指针异常", e);
             statistics.put("success", false);
-            statistics.put("message", "计算统计数据失败: " + e.getMessage());
+            statistics.put("message", "计算统计数据失败: 遇到空指针异常，请检查数据完整性");
+            log.debug("空指针异常堆栈详情:", e);
+        } catch (Exception e) {
+            log.error("计算总体统计数据时发生异常", e);
+            statistics.put("success", false);
+            // 改进错误消息处理，确保不会出现'null'消息
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "未知错误";
+            statistics.put("message", "计算统计数据失败: " + errorMessage);
+            // 添加详细的错误堆栈信息到日志，便于调试
+            log.debug("异常堆栈详情:", e);
         }
         
         return statistics;
@@ -88,14 +142,20 @@ public class StatisticsServiceImpl implements StatisticsService {
         Map<String, Object> statistics = new HashMap<>();
         
         try {
+            log.debug("开始计算时间范围统计数据: {} 至 {}", startDate, endDate);
+            
             // 转换日期为LocalDateTime
             LocalDateTime startDateTime = startDate.atStartOfDay();
             LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay().minusSeconds(1);
+            log.debug("日期转换完成，查询时间范围: {} 至 {}", startDateTime, endDateTime);
             
             // 获取时间范围内的活动
+            log.debug("从数据库获取指定时间范围内的活动记录");
             List<Activity> activities = activityRepository.findByStartTimeBetween(startDateTime, endDateTime);
+            log.debug("成功获取 {} 条符合条件的活动记录", activities.size());
             
             // 计算统计数据
+            log.debug("开始计算时间范围内的统计数据");
             double totalDistance = activities.stream()
                     .mapToDouble(Activity::getDistance)
                     .filter(Objects::nonNull)
@@ -111,6 +171,12 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .filter(Objects::nonNull)
                     .sum();
             
+            log.debug("时间范围内统计结果: 距离={}公里, 时长={}小时, 卡路里={}卡, 活动数={}个",
+                    Math.round(totalDistance * 100) / 100.0,
+                    Math.round(totalDuration * 100) / 100.0,
+                    totalCalories,
+                    activities.size());
+            
             // 填充统计数据
             statistics.put("startDate", startDate);
             statistics.put("endDate", endDate);
@@ -121,10 +187,13 @@ public class StatisticsServiceImpl implements StatisticsService {
             statistics.put("activities", activities);
             
             statistics.put("success", true);
+            log.info("时间范围统计数据计算成功: {} 至 {}", startDate, endDate);
             
         } catch (Exception e) {
+            log.error("计算时间范围统计数据时发生异常: 开始日期={}, 结束日期={}", startDate, endDate, e);
             statistics.put("success", false);
             statistics.put("message", "计算时间范围统计数据失败: " + e.getMessage());
+            log.debug("异常堆栈详情:", e);
         }
         
         return statistics;
@@ -255,6 +324,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         Map<String, Object> statistics = new HashMap<>();
         Map<String, Integer> zoneCount = new HashMap<>();
         
+        log.debug("开始计算心率区间统计数据");
+        
         // 初始化心率区间
         zoneCount.put("恢复区 (50-60%)", 0);
         zoneCount.put("有氧区 (60-70%)", 0);
@@ -264,12 +335,18 @@ public class StatisticsServiceImpl implements StatisticsService {
         
         try {
             // 获取所有活动
+            log.debug("从数据库获取所有活动记录用于心率区间统计");
             List<Activity> allActivities = activityRepository.findAll();
+            log.debug("成功获取 {} 条活动记录", allActivities.size());
             
             // 简化版本：基于平均心率进行区间统计
             // 实际应用中应该基于最大心率百分比进行计算
+            log.debug("开始按心率区间分类统计活动");
+            int activitiesWithHeartRate = 0;
+            
             for (Activity activity : allActivities) {
                 if (activity.getAverageHeartRate() != null) {
+                    activitiesWithHeartRate++;
                     int avgHR = activity.getAverageHeartRate();
                     
                     // 这里使用简化的心率区间判断
@@ -288,13 +365,20 @@ public class StatisticsServiceImpl implements StatisticsService {
                 }
             }
             
+            log.debug("心率区间统计完成, 有心率数据的活动数量: {}", activitiesWithHeartRate);
+            log.debug("心率区间分布: {}", zoneCount);
+            
             statistics.put("zoneDistribution", zoneCount);
             statistics.put("totalActivities", allActivities.size());
+            statistics.put("activitiesWithHeartRate", activitiesWithHeartRate);
             statistics.put("success", true);
+            log.info("心率区间统计计算成功");
             
         } catch (Exception e) {
+            log.error("计算心率区间统计时发生异常", e);
             statistics.put("success", false);
             statistics.put("message", "计算心率区间统计失败: " + e.getMessage());
+            log.debug("异常堆栈详情:", e);
         }
         
         return statistics;
@@ -305,6 +389,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         Map<String, Object> statistics = new HashMap<>();
         Map<String, Integer> zoneCount = new HashMap<>();
         
+        log.debug("开始计算配速区间统计数据");
+        
         // 初始化配速区间（单位：分钟/公里）
         zoneCount.put("轻松跑 (>6'30\")", 0);
         zoneCount.put("有氧跑 (5'30\"-6'30\")", 0);
@@ -314,7 +400,11 @@ public class StatisticsServiceImpl implements StatisticsService {
         
         try {
             // 获取所有跑步活动
-            List<Activity> runningActivities = activityRepository.findAll().stream()
+            log.debug("从数据库获取所有跑步活动记录用于配速区间统计");
+            List<Activity> allActivities = activityRepository.findAll();
+            log.debug("获取到 {} 条活动记录，开始筛选跑步活动", allActivities.size());
+            
+            List<Activity> runningActivities = allActivities.stream()
                     .filter(a -> a.getActivityType() != null && 
                             (a.getActivityType().contains("Run") || 
                              a.getActivityType().contains("跑步") ||
@@ -322,7 +412,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .filter(a -> a.getAveragePace() != null)
                     .collect(Collectors.toList());
             
+            log.debug("成功筛选出 {} 条跑步活动记录（有配速数据）", runningActivities.size());
+            
             // 统计配速区间
+            log.debug("开始按配速区间分类统计跑步活动");
             for (Activity activity : runningActivities) {
                 double pace = activity.getAveragePace();
                 
@@ -339,13 +432,19 @@ public class StatisticsServiceImpl implements StatisticsService {
                 }
             }
             
+            log.debug("配速区间统计完成");
+            log.debug("配速区间分布: {}", zoneCount);
+            
             statistics.put("zoneDistribution", zoneCount);
             statistics.put("totalRunningActivities", runningActivities.size());
             statistics.put("success", true);
+            log.info("配速区间统计计算成功");
             
         } catch (Exception e) {
+            log.error("计算配速区间统计时发生异常", e);
             statistics.put("success", false);
             statistics.put("message", "计算配速区间统计失败: " + e.getMessage());
+            log.debug("异常堆栈详情:", e);
         }
         
         return statistics;
