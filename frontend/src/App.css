@@ -39,63 +39,703 @@
 
 /* 布局样式 */
 .site-layout-content {
-  margin-top: 24px;
-  margin-bottom: 24px;
+  margin: 0;
+  padding: 0;
 }
 
 .page-content {
-  padding: 20px;
+  padding: 0;
 }
 
 .upload-area {
   margin-top: 30px;
   padding: 40px;
-  border: 2px dashed #d9d9d9;
-  border-radius: 8px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-md);
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  background: #FFFFFF;
+  box-shadow: var(--box-shadow-light);
 }
 
 .upload-area:hover {
-  border-color: #40a9ff;
+  border-color: var(--primary-color);
+  background: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-medium);
 }
 
 /* 统计卡片样式 */
 .stats-card {
   padding: 20px;
-  background: #fafafa;
-  border-radius: 8px;
+  background: #FFFFFF;
+  border-radius: var(--border-radius-md);
   margin-bottom: 20px;
+  box-shadow: var(--box-shadow-light);
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-medium);
 }
 
 .stats-card h3 {
   margin-top: 0;
-  color: #1890ff;
+  color: var(--primary-color);
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .stats-card .value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 /* 图表容器样式 */
 .chart-container {
-  margin-top: 30px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 24px;
+  background: transparent;
+  padding: 0;
+  border-radius: var(--border-radius-md);
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  transform: translateY(-2px);
+}
+
+/* 仪表盘样式 */
+.dashboard {
+  width: 100%;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .site-layout-content {
-    padding: 16px;
+    padding: 0;
   }
   
   .upload-area {
-    padding: 20px;
+    padding: 24px;
+    margin-top: 20px;
   }
+  
+  .stats-card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .stats-card .value {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .upload-area {
+    padding: 32px;
+  }
+}
+
+/* 动画效果 - 极简现代风格 */
+/* 基础动画关键帧 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes hoverScale {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 页面内容动画 */
+.page-content {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* 卡片动画 */
+.stats-card,
+.chart-container {
+  animation: fadeIn 0.4s ease-out;
+  transition: all 0.2s ease;
+}
+
+.stats-card:hover,
+.chart-container:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+/* 菜单动画 */
+.ant-menu-item {
+  transition: all 0.2s ease;
+}
+
+.ant-menu-item:hover {
+  transform: translateX(2px);
+  background-color: var(--bg-lighter) !important;
+}
+
+.ant-menu-item-selected {
+  transform: translateX(0) !important;
+}
+
+/* 按钮样式优化 */
+.ant-btn {
+  transition: all 0.2s ease;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  font-family: var(--font-family);
+  box-shadow: none;
+  background-color: var(--primary-color);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.ant-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ant-btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+.ant-btn:hover {
+  background-color: #FF5500;
+  transform: translateY(0);
+  box-shadow: var(--box-shadow-light);
+}
+
+.ant-btn:focus,
+.ant-btn-focused {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.ant-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* 次要按钮样式 */
+.ant-btn-default {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.ant-btn-default:hover {
+  background-color: var(--bg-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* 文本按钮样式 */
+.ant-btn-text {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: none;
+  padding: 4px 8px;
+}
+
+.ant-btn-text:hover {
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+}
+
+/* 移动端按钮样式 */
+@media (max-width: 768px) {
+  .ant-btn {
+    padding: 6px 12px;
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* 表单组件动画 */
+.ant-input,
+.ant-select-selector,
+.ant-upload-drag,
+.ant-picker {
+  transition: all 0.2s ease;
+  border-radius: var(--border-radius-sm);
+}
+
+.ant-input:focus,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  transform: translateY(0);
+  box-shadow: 0 0 0 2px var(--primary-light);
+  border-color: var(--primary-color);
+}
+
+.ant-input:hover,
+.ant-select-selector:hover,
+.ant-picker:hover {
+  border-color: var(--primary-color);
+}
+
+/* 统计卡片动画 */
+.stat-card {
+  animation: fadeIn 0.3s ease-out;
+  transition: all 0.2s ease;
+}
+
+.stat-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.stat-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.stat-card:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+/* 图表动画 */
+.chart-container {
+  animation: scaleIn 0.5s ease-out;
+  transition: all 0.2s ease;
+}
+
+.chart-container:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+/* 加载动画 */
+.ant-spin {
+  animation: pulse 1.5s infinite;
+}
+
+/* 抽屉动画 */
+.ant-drawer {
+  transition: all 0.3s ease;
+}
+
+.ant-drawer-content-wrapper {
+  box-shadow: var(--box-shadow-hover);
+}
+
+/* 上传组件动画 */
+.ant-upload-drag {
+  transition: all 0.2s ease;
+}
+
+.ant-upload-drag:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+/* 选择器动画 */
+.ant-select-dropdown {
+  animation: fadeIn 0.2s ease-out;
+  box-shadow: var(--box-shadow-hover);
+  border-radius: var(--border-radius-sm);
+}
+
+/* 模态框动画 */
+.ant-modal {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.ant-modal-content {
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--box-shadow-hover);
+}
+
+/* 通知动画 */
+.ant-notification {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* 标签页动画 */
+.ant-tabs-tab {
+  transition: all 0.2s ease;
+}
+
+.ant-tabs-tab:hover {
+  color: var(--primary-color);
+}
+
+.ant-tabs-ink-bar {
+  background-color: var(--primary-color);
+}
+
+/* 滚动时的渐显效果 */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 数字增长动画 */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 进度条动画 */
+.ant-progress-bg {
+  transition: width 0.6s ease-out;
+}
+
+/* 步骤条动画 */
+.ant-steps-item {
+  transition: all 0.3s ease;
+}
+
+/* 面包屑动画 */
+.ant-breadcrumb-item a {
+  transition: all 0.2s ease;
+}
+
+.ant-breadcrumb-item a:hover {
+  color: var(--primary-color);
+}
+
+/* 表格动画 */
+.ant-table-tbody > tr {
+  transition: all 0.2s ease;
+}
+
+.ant-table-tbody > tr:hover {
+  background-color: var(--bg-lighter);
+}
+
+/* 日历动画 */
+.ant-picker-cell:hover {
+  background-color: var(--bg-lighter);
+}
+
+.ant-picker-cell-today .ant-picker-cell-inner {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* 滑块动画 */
+.ant-slider-track {
+  background-color: var(--primary-color);
+  transition: width 0.2s ease;
+}
+
+/* 评分动画 */
+.ant-rate-star {
+  transition: all 0.2s ease;
+}
+
+.ant-rate-star:hover {
+  transform: scale(1.2);
+}
+
+/* 开关动画 */
+.ant-switch {
+  transition: all 0.2s ease;
+  background-color: var(--border-color);
+}
+
+.ant-switch-checked {
+  background-color: var(--primary-color);
+}
+
+.ant-switch-handle {
+  transition: all 0.2s ease;
+}
+
+/* 响应式设计优化 */
+/* 移动端适配 (<= 768px) */
+@media (max-width: 768px) {
+  /* 布局调整 */
+  .site-layout-content {
+    padding: 16px !important;
+  }
+  
+  .page-content {
+    padding: 0 !important;
+  }
+  
+  /* 卡片样式调整 */
+  .stats-card,
+  .chart-container {
+    animation: slideInLeft 0.3s ease-out;
+    margin-bottom: 16px;
+  }
+  
+  .stats-card {
+    padding: 12px !important;
+  }
+  
+  .stats-card .value {
+    font-size: 24px !important;
+  }
+  
+  /* 按钮样式调整 */
+  .ant-btn {
+    animation: scaleIn 0.3s ease-out;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  /* 表单样式调整 */
+  .ant-input,
+  .ant-select-selector {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  /* 标题样式调整 */
+  h1 {
+    font-size: 20px !important;
+  }
+  
+  h2 {
+    font-size: 18px !important;
+  }
+  
+  h3 {
+    font-size: 16px !important;
+  }
+  
+  /* 文本样式调整 */
+  p {
+    font-size: 14px !important;
+  }
+  
+  /* 菜单样式调整 */
+  .ant-menu-item {
+    padding: 8px 16px !important;
+  }
+  
+  /* 图表样式调整 */
+  .chart-container {
+    height: 250px !important;
+  }
+  
+  /* 上传区域样式调整 */
+  .upload-area {
+    padding: 24px !important;
+    margin-top: 20px !important;
+  }
+}
+
+/* 平板适配 (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* 布局调整 */
+  .site-layout-content {
+    padding: 20px !important;
+  }
+  
+  /* 卡片样式调整 */
+  .stats-card,
+  .chart-container {
+    margin-bottom: 20px;
+  }
+  
+  /* 图表样式调整 */
+  .chart-container {
+    height: 300px !important;
+  }
+  
+  /* 上传区域样式调整 */
+  .upload-area {
+    padding: 32px !important;
+  }
+}
+
+/* 桌面适配 (>= 1025px) */
+@media (min-width: 1025px) {
+  /* 布局调整 */
+  .site-layout-content {
+    padding: 24px !important;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* 卡片样式调整 */
+  .stats-card,
+  .chart-container {
+    margin-bottom: 24px;
+  }
+  
+  /* 图表样式调整 */
+  .chart-container {
+    height: 350px !important;
+  }
+}
+
+/* 超宽屏适配 (>= 1440px) */
+@media (min-width: 1440px) {
+  /* 布局调整 */
+  .site-layout-content {
+    max-width: 1400px;
+  }
+}
+
+/* 拖拽上传组件样式 */
+.ant-upload-drag {
+  border: 2px dashed var(--border-color) !important;
+  border-radius: var(--border-radius-md) !important;
+  transition: all 0.3s ease !important;
+  background: #FFFFFF !important;
+}
+
+.ant-upload-drag:hover {
+  border-color: var(--primary-color) !important;
+  background: var(--primary-light) !important;
+  transform: translateY(-2px);
+}
+
+.ant-upload-drag-icon {
+  color: var(--primary-color) !important;
+  font-size: 48px !important;
+}
+
+.ant-upload-text {
+  color: var(--text-primary) !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+.ant-upload-hint {
+  color: var(--text-tertiary) !important;
+  font-size: 14px !important;
+}
+
+/* 选择器样式 */
+.ant-select-selector {
+  border-radius: var(--border-radius-sm) !important;
+  border: 1px solid var(--border-color) !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-select-selector:hover {
+  border-color: var(--primary-color) !important;
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--primary-light) !important;
+}
+
+/* 标题样式 */
+.ant-typography {
+  color: var(--text-primary) !important;
+}
+
+.ant-typography-h4 {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+/* 文本样式 */
+.ant-typography-secondary {
+  color: var(--text-secondary) !important;
 }
